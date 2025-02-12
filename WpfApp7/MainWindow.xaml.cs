@@ -84,6 +84,7 @@ namespace WpfApp7
             }
         }
 
+
         private async Task UpdateWeather(string city)
         {
             try
