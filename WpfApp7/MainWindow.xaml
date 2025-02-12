@@ -6,7 +6,44 @@
         xmlns:local="clr-namespace:WpfApp7"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <Grid Background="Beige">
+        <Grid Background="#67BA80" Height="65" VerticalAlignment="Top">
+            <Label Content="Прогнозы погоды" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" FontStyle="Italic" FontWeight="Bold" Foreground="Beige"/>
 
+        </Grid>
+
+        <Grid Background="#67BA80" HorizontalAlignment="Left" Width="125" Margin="0,00,0,0"/>
+        <Label Content="Введите город" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" FontStyle="Italic" FontWeight="Bold" Foreground="Beige" Margin="5,55,0,0"/>
+
+        <TextBox x:Name="CityTextBox" Width="115" Height="25" Margin="5,86,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" 
+         FontSize="16" BorderBrush="Beige" BorderThickness="2"/>
+
+        <Button Content="Обновить" Width="115" Height="25" Margin="5,116,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"
+        Background="Beige" FontStyle="Italic" FontWeight="Bold" Foreground="Black" FontSize="14" BorderThickness="0" Cursor="Hand" Click="UpdateWeather_Click"/>
+
+        <TextBlock x:Name="RequestCountTextBlock" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontStyle="Italic" FontWeight="Bold" Foreground="Beige" Width="109" Margin="16,159,0,0" Height="150">
+        <UIElement.RenderTransform>
+            <TransformGroup>
+                <ScaleTransform/>
+                <SkewTransform/>
+                <RotateTransform/>
+                <TranslateTransform/>
+            </TransformGroup>
+        </UIElement.RenderTransform>
+        </TextBlock>
+
+        <DataGrid x:Name="WeatherDataGrid" AutoGenerateColumns="False" 
+          Margin="130,70,10,10" HeadersVisibility="Column" GridLinesVisibility="None" 
+          RowBackground="#FAFAFA" AlternatingRowBackground="#F0F0F0" BorderBrush="#DDD" BorderThickness="1">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Дата и время" Binding="{Binding DateTime}" Width="120"/>
+                <DataGridTextColumn Header="Температура" Binding="{Binding Temperature}" Width="100"/>
+                <DataGridTextColumn Header="Давление" Binding="{Binding Pressure}" Width="100"/>
+                <DataGridTextColumn Header="Влажность" Binding="{Binding Humidity}" Width="100"/>
+                <DataGridTextColumn Header="Ветер" Binding="{Binding WindSpeed}" Width="100"/>
+                <DataGridTextColumn Header="Ощущается как" Binding="{Binding FeelsLike}" Width="120"/>
+                <DataGridTextColumn Header="Описание" Binding="{Binding WeatherDescription}" Width="150"/>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>
