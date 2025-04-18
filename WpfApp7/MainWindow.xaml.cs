@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using WpfApp7.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfApp7;
 
 namespace WpfApp7
 {
@@ -23,13 +23,20 @@ namespace WpfApp7
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string ApiKey = "7d2b3ded4b7c1c64ccabab0e50dd27e8";
+        private static readonly HttpClient client = new HttpClient();
+        private const string ApiKey = "eb4eef9a51c416fe612aea9109273d9c";
         private const string ApiUrl = "https://api.openweathermap.org/data/2.5/forecast?q={0}&appid={1}&units=metric&lang=ru";
-
         public MainWindow()
         {
             InitializeComponent();
-            WeatherCache.InitializeDatabase();
+            string currentCity = "Пермь";
+            UpdateWeather(currentCity);
+        }
+        private async Task UpdateWeather(string city)
+        {
+            var weatherData = await FetchWeatherData(city);
+            WeatherDataGrid.ItemsSource = weatherData;
+            LocationLabel.Content = $"Текущее место: {city}";
         }
 
         private async void UpdateWeather_Click(object sender, RoutedEventArgs e)
@@ -38,19 +45,25 @@ namespace WpfApp7
 
             if (string.IsNullOrEmpty(city))
             {
-                MessageBox.Show("Введите название города.");
-                return;
+                city = "Пермь";
             }
 
-
+            await UpdateWeather(city);
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void UpdateKey(object sender, KeyEventArgs e)
         {
-            string defaultCity = "Пермь";
-
+            string city = CityTextBox.Text.Trim();
+            if (e.Key == Key.Enter)
+            {
+                if (string.IsNullOrEmpty(city))
+                {
+                    MessageBox.Show("Неккоректный ввод города");
+                    return;
+                }
+                await UpdateWeather(city);
+            }
         }
-
         private async Task<List<WeatherData>> FetchWeatherData(string city)
         {
             using (HttpClient client = new HttpClient())
@@ -62,6 +75,7 @@ namespace WpfApp7
                 {
                     throw new Exception($"Ошибка {response.StatusCode}: {response.ReasonPhrase}");
                 }
+
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var json = JsonConvert.DeserializeObject<dynamic>(responseBody);
 
@@ -80,52 +94,9 @@ namespace WpfApp7
                         WeatherDescription = item.weather[0].description.ToString(),
                     });
                 }
+
                 return weatherList;
             }
-
-        }
-
-
-        private async Task UpdateWeather(string city)
-        {
-            try
-            {
-                int requestCount = WeatherCache.GetRequestCountForToday();
-
-                if (requestCount >= 500)
-                {
-                    var cachedData = WeatherCache.GetWeatherData(city);
-                    if (cachedData.Count > 0)
-                    {
-                        WeatherDataGrid.ItemsSource = cachedData;
-                        MessageBox.Show("Данные для города получены из кэша");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Лимит запросов на сегодня превышен");
-                    }
-                }
-                else
-                {
-                    var weatherData = await FetchWeatherData(city);
-                    WeatherDataGrid.ItemsSource = weatherData;
-
-                    foreach (var data in weatherData)
-                    {
-                        WeatherCache.SaveWeatherData(city, data.DateTime, data.Temperature, data.Pressure, data.Humidity, data.WindSpeed, data.FeelsLike, data.WeatherDescription);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка загрузки данных: {ex.Message}");
-            }
-        }
-
-        private void UpdateRequestCount()
-        {
-            int requestCount = WeatherCache.GetRequestCountForToday();
-            RequestCountTextBlock.Text = $"Количество запросов сегодня: {requestCount}";
         }
     }
 }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WpfApp7.Classes
+namespace WpfApp7
 {
-    internal class WeatherData
+    public class WeatherData
     {
         public string DateTime { get; set; }
         public string Temperature { get; set; }
